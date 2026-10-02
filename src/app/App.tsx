@@ -4,7 +4,6 @@ import { useContext } from "react";
 import { CssBaseline } from "@mui/material";
 
 import { RouterProvider, createHashRouter } from "react-router-dom";
-import { createBrowserRouter } from "react-router-dom";
 import Home from "./pages/home";
 import Template from "./template";
 import { useEffect } from "react";
@@ -24,7 +23,7 @@ const routes = [
     ],
   },
 ];
-const router = createBrowserRouter(routes);
+const router = createHashRouter(routes);
 
 export function useApp() {
   return useContext(AppContext);
