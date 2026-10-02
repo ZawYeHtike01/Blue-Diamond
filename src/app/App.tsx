@@ -30,23 +30,6 @@ export function useApp() {
 }
 
 function App() {
-  const [isauth, setisAuth] = useState(false);
-  const [showDrawer, setShowDrawer] = useState(false);
-  const [globalMsg, setGlobalMsg] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [JapanseHolidays, setJapaneseHolidays] = useState([]);
-  const [userData, setUserData] = useState();
-  const [workname, setWorkName] = useState([]);
-  const [monthCache, setMonthCache] = useState({});
-  const [total, setTotal] = useState();
-  const [checkHour, setCheckHour] = useState([]);
-  const [course, setCourse] = useState({});
-  const [admin, setAdmin] = useState(false);
-  const [work,setWork]=useState('all');
-  
-  
-
 
   return (
     <AppContext.Provider

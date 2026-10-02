@@ -117,7 +117,7 @@ export default function Template() {
             {SECTIONS.map(({ id, label }) => (
               <a
                 key={id}
-                href={`#${id}`}
+                href={`#/${id}`}
                 className={`
                   text-[10px]
 
@@ -319,7 +319,7 @@ export default function Template() {
           {SECTIONS.map(({ id, label }) => (
             <a
               key={id}
-              href={`/#${id}`}
+              href={`#/${id}`}
               onClick={() => {
                 setActiveSection(id);
                 setMenuOpen(false);
