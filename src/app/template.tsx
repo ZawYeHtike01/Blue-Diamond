@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 
 const SECTIONS = [
   { id: "top", label: "TOP" },
-  { id: "concept", label: "ABOUT US" },
-  { id: "lineup", label: "NEWS" },
-  { id: "tour", label: "MEMBER NOTE" },
+  { id: "about_us", label: "ABOUT US" },
+  { id: "news", label: "NEWS" },
+  { id: "member_note", label: "MEMBER NOTE" },
   { id: "gallery", label: "GALLERY" },
   { id: "contact", label: "CONTACT" },
 ];
@@ -17,25 +17,6 @@ export default function Template() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-
-    if (!element) {
-      console.log("Section not found:", id);
-      return;
-    }
-
-    setActiveSection(id);
-    setMenuOpen(false);
-
-    setTimeout(() => {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 50);
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -136,7 +117,7 @@ export default function Template() {
             {SECTIONS.map(({ id, label }) => (
               <a
                 key={id}
-                onClick={() => scrollToSection(id)}
+                href={`#/${id}`}
                 className={`
                   text-[10px]
 
@@ -155,7 +136,7 @@ export default function Template() {
                 `}
                 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
-                  cursor: "pointer",
+
                   fontWeight: 600,
                 }}
               >
@@ -319,31 +300,31 @@ export default function Template() {
       {menuOpen && (
         <div
           className="
-      fixed
-      inset-0
-      z-[100]
-      flex
-      min-[1100px]:hidden
-      h-dvh
-      w-full
-      flex-col
-      items-center
-      justify-center
-      gap-8
-      bg-background/95
-      backdrop-blur-md
-    "
+            flex
+            min-[1100px]:hidden
+            fixed
+            inset-0
+            z-40
+            h-dvh
+            w-full
+            flex-col
+            items-center
+            justify-center
+            gap-8
+            pt-14
+            bg-background/95
+            backdrop-blur-md
+          "
         >
           {SECTIONS.map(({ id, label }) => (
-            <button
+            <a
               key={id}
-              type="button"
-              onClick={() => scrollToSection(id)}
+              href={`#/${id}`}
+              onClick={() => {
+                setActiveSection(id);
+                setMenuOpen(false);
+              }}
               className={`
-      border-0
-      bg-transparent
-      p-0
-      cursor-pointer
       text-4xl
       font-black
       transition-colors
@@ -356,7 +337,7 @@ export default function Template() {
               }}
             >
               {label}
-            </button>
+            </a>
           ))}
         </div>
       )}

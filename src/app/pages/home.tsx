@@ -338,7 +338,7 @@ export default function Home() {
         ================================================== */}
 
         <section
-          id="concept"
+          id="about_us"
           className="
             overflow-hidden
             bg-background
@@ -467,8 +467,173 @@ export default function Home() {
           />
         </div>
 
+        
+
         <section
-          id="lineup"
+          id="news"
+          className="
+            bg-background
+            py-24
+            scroll-mt-14
+            md:py-36
+          "
+        >
+          <div className="px-6 md:px-16">
+            <div
+              className="
+                mb-4
+                flex
+                items-center
+                gap-5
+              "
+            >
+              <div
+                className="
+                  text-[11px]
+                  uppercase
+                  tracking-[0.35em]
+                  text-primary
+                "
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                }}
+              >
+                BLUE DIAMOND
+              </div>
+
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <h2
+              className="
+                mb-4
+                text-5xl
+                font-black
+                uppercase
+                leading-none
+                text-foreground
+                md:text-7xl
+              "
+              style={{
+                fontFamily: "'Big Shoulders Display', sans-serif",
+              }}
+            >
+              NEWS
+            </h2>
+
+            <div className="border-t border-border">
+              {TOUR_DATES.map((show, i) => (
+                <div
+                  key={i}
+                  className="
+                    group
+                    flex
+                    flex-col
+                    gap-3
+                    border-b
+                    border-border
+                    px-0
+                    py-6
+                    transition-colors
+                    duration-150
+                    hover:bg-card
+                    sm:flex-row
+                    sm:items-center
+                    sm:gap-0
+                    md:hover:px-6
+                  "
+                >
+                  <div
+                    className="
+                      text-sm
+                      font-bold
+                      text-foreground
+                      sm:w-44
+                    "
+                    style={{
+                      fontFamily: "'Barlow Condensed', sans-serif",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    {show.date}
+                  </div>
+
+                  <div
+                    className="
+                      flex-2
+                      text-sm
+                      font-light
+                      text-foreground
+                    "
+                  >
+                    {show.venue}
+                  </div>
+
+                  <div className="sm:w-36 sm:text-right">
+                    <button
+                      type="button"
+                      className="
+                        cursor-pointer
+                          inline-block
+                          border-0
+                          bg-primary
+                          px-4
+                          py-2
+                          text-[10px]
+                          font-black
+                          tracking-widest
+                          text-primary-foreground
+                          transition-colors
+                          duration-150
+                          hover:bg-foreground
+                        "
+                      style={{
+                        fontFamily: "'Barlow Condensed', sans-serif",
+                      }}
+                    >
+                      View Details→
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "2rem",
+            }}
+          >
+            <button
+              type="button"
+              className="
+                          cursor-pointer
+                          border-0
+                          bg-primary
+                          px-4
+                          py-2
+                          text-[10px]
+                          font-black
+                          tracking-widest
+                          text-primary-foreground
+                          transition-colors
+                          duration-150
+                          hover:bg-foreground
+                        "
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+              }}
+            >
+              MORES →
+            </button>
+          </div>
+        </section>
+        <section
+          id="member_note"
           className="
             bg-secondary
             py-24
@@ -729,170 +894,6 @@ export default function Home() {
             </button>
           </div>
         </section>
-
-        <section
-          id="tour"
-          className="
-            bg-background
-            py-24
-            scroll-mt-14
-            md:py-36
-          "
-        >
-          <div className="px-6 md:px-16">
-            <div
-              className="
-                mb-4
-                flex
-                items-center
-                gap-5
-              "
-            >
-              <div
-                className="
-                  text-[11px]
-                  uppercase
-                  tracking-[0.35em]
-                  text-primary
-                "
-                style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontWeight: 700,
-                }}
-              >
-                BLUE DIAMOND
-              </div>
-
-              <div className="h-px flex-1 bg-border" />
-            </div>
-
-            <h2
-              className="
-                mb-4
-                text-5xl
-                font-black
-                uppercase
-                leading-none
-                text-foreground
-                md:text-7xl
-              "
-              style={{
-                fontFamily: "'Big Shoulders Display', sans-serif",
-              }}
-            >
-              NEWS
-            </h2>
-
-            <div className="border-t border-border">
-              {TOUR_DATES.map((show, i) => (
-                <div
-                  key={i}
-                  className="
-                    group
-                    flex
-                    flex-col
-                    gap-3
-                    border-b
-                    border-border
-                    px-0
-                    py-6
-                    transition-colors
-                    duration-150
-                    hover:bg-card
-                    sm:flex-row
-                    sm:items-center
-                    sm:gap-0
-                    md:hover:px-6
-                  "
-                >
-                  <div
-                    className="
-                      text-sm
-                      font-bold
-                      text-foreground
-                      sm:w-44
-                    "
-                    style={{
-                      fontFamily: "'Barlow Condensed', sans-serif",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    {show.date}
-                  </div>
-
-                  <div
-                    className="
-                      flex-2
-                      text-sm
-                      font-light
-                      text-foreground
-                    "
-                  >
-                    {show.venue}
-                  </div>
-
-                  <div className="sm:w-36 sm:text-right">
-                    <button
-                      type="button"
-                      className="
-                        cursor-pointer
-                          inline-block
-                          border-0
-                          bg-primary
-                          px-4
-                          py-2
-                          text-[10px]
-                          font-black
-                          tracking-widest
-                          text-primary-foreground
-                          transition-colors
-                          duration-150
-                          hover:bg-foreground
-                        "
-                      style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
-                      }}
-                    >
-                      View Details→
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: "2rem",
-            }}
-          >
-            <button
-              type="button"
-              className="
-                          cursor-pointer
-                          border-0
-                          bg-primary
-                          px-4
-                          py-2
-                          text-[10px]
-                          font-black
-                          tracking-widest
-                          text-primary-foreground
-                          transition-colors
-                          duration-150
-                          hover:bg-foreground
-                        "
-              style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-              }}
-            >
-              MORES →
-            </button>
-          </div>
-        </section>
         <div>
           <div
             style={{
@@ -913,6 +914,7 @@ export default function Home() {
               letterSpacing: "-0.01em",
               fontWeight: "bolder",
               textAlign: "center",
+              marginBottom:"10rem"
             }}
           >
             <span className="text-foreground">BLUE</span>
@@ -1245,7 +1247,7 @@ export default function Home() {
                     gap-3
                   "
                 >
-                  {["INSTAGRAM", "SPOTIFY", "YOUTUBE", "BANDCAMP"].map((s) => (
+                  {["INSTAGRAM", "YOUTUBE", "TIKTOK"].map((s) => (
                     <button
                       key={s}
                       type="button"
@@ -1389,9 +1391,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ==================================================
-            FOOTER
-        ================================================== */}
+        
 
         <footer
           className="
@@ -1424,7 +1424,8 @@ export default function Home() {
                 fontFamily: "'Big Shoulders Display', sans-serif",
               }}
             >
-              BLUE DIAMOND
+              <span className="text-primary">BLUE </span>
+              <span className="text-foreground">DIAMOND</span>
             </div>
 
             <div
@@ -1443,9 +1444,7 @@ export default function Home() {
         </footer>
       </main>
 
-      {/* ==================================================
-          GLOBAL STYLE
-      ================================================== */}
+      
 
       <style>{`
         html {
