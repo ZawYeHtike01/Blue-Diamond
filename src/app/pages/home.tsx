@@ -1,36 +1,37 @@
 import { useState } from "react";
 import Lunch from "../components/main_components/lunch_event";
+import Good from "../components/main_components/goodthings";
 
 const ALBUMS = [
   {
     id: "01",
-    title: "Crystalline",
-    year: "2023",
-    type: "FULL ALBUM",
+    title: "Kaung Khant Kyaw",
+    year: "2025",
+    type: "MEMBER",
     tracks: 11,
-    tag: "LATEST",
+    tag: "Guitarist",
     color: "#3b82f6",
     img: "https://images.unsplash.com/photo-1765224747205-3c9c23f0553c?w=600&h=800&fit=crop&auto=format",
     desc: "Their landmark debut — eleven tracks of compressed post-rock clarity and devastating beauty.",
   },
   {
     id: "02",
-    title: "Depths",
-    year: "2021",
-    type: "EP",
+    title: "ZAW YE HTIKE",
+    year: "2025",
+    type: "MEMBER",
     tracks: 6,
-    tag: "EP",
+    tag: "Guitarist",
     color: "#1d4ed8",
     img: "https://images.unsplash.com/photo-1765224747170-be7b97010052?w=600&h=800&fit=crop&auto=format",
     desc: "Six tracks recorded live in a single night — raw, uncompressed, and essential.",
   },
   {
     id: "03",
-    title: "Signal / Noise",
-    year: "2020",
-    type: "SINGLE",
+    title: "AYE MYAT MON",
+    year: "2025",
+    type: "Vacalist",
     tracks: 2,
-    tag: "SINGLE",
+    tag: "Vacalist",
     color: "#60a5fa",
     img: "https://images.unsplash.com/photo-1549046701-6bd11cf71796?w=600&h=800&fit=crop&auto=format",
     desc: "The debut single that introduced Blue Diamond to the world. Still devastating.",
@@ -40,7 +41,8 @@ const ALBUMS = [
 const TOUR_DATES = [
   {
     date: "2026.08.14",
-    venue: "Blue Note Tokyo",
+    venue:
+      "The debut single that introduced Blue Diamond to the world. Still devastating.",
     city: "TOKYO",
     status: "SOLD OUT",
   },
@@ -79,32 +81,58 @@ const TOUR_DATES = [
 export default function Home() {
   const [selectedAlbum, setSelectedAlbum] = useState<number | null>(null);
 
+  /*
+   * IMPORTANT:
+   * We don't use href="#lineup" etc.
+   * because this project uses createHashRouter.
+   *
+   * This directly scrolls to the section without
+   * changing the router hash.
+   */
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+
+    if (!element) {
+      console.log("Section not found:", id);
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <div
       className="
         w-full
+        min-h-screen
         bg-background
         text-foreground
-        min-h-screen
         overflow-x-hidden
       "
       style={{
         fontFamily: "'Barlow', sans-serif",
       }}
     >
+      {/* ==================================================
+          LOADING / INTRO
+      ================================================== */}
+
       <div
         className="
           fixed
           inset-0
           z-[100]
-          bg-background
           flex
           items-center
           justify-center
-          transition-opacity
-          duration-700
+          bg-background
           pointer-events-none
           opacity-0
+          transition-opacity
+          duration-700
         "
       >
         <div
@@ -124,6 +152,10 @@ export default function Home() {
       </div>
 
       <main className="lg:pr-14">
+        {/* ==================================================
+            TOP
+        ================================================== */}
+
         <section
           id="top"
           className="
@@ -135,6 +167,7 @@ export default function Home() {
             justify-end
             overflow-hidden
             bg-[#04080f]
+            scroll-mt-14
           "
         >
           <img
@@ -176,7 +209,6 @@ export default function Home() {
             }}
           />
 
-
           <div
             className="
               relative
@@ -187,11 +219,11 @@ export default function Home() {
           >
             <div
               className="
+                mb-4
                 text-[11px]
+                uppercase
                 tracking-[0.4em]
                 text-primary
-                uppercase
-                mb-4
               "
               style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
@@ -203,11 +235,11 @@ export default function Home() {
 
             <h1
               className="
+                mb-6
                 font-black
-                text-foreground
                 uppercase
                 leading-[0.88]
-                mb-6
+                text-foreground
               "
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
@@ -230,74 +262,87 @@ export default function Home() {
                 md:gap-8
               "
             >
-              <a
-                href="#lineup"
+              {/* FIXED:
+                  Don't use href="#lineup" with createHashRouter.
+              */}
+
+              <button
+                type="button"
+                onClick={() => scrollToSection("lineup")}
                 className="
                   inline-block
+                  cursor-pointer
+                  border-0
                   bg-primary
-                  text-primary-foreground
                   px-2
                   py-4
-                  font-black
                   text-sm
-                  tracking-widest
+                  font-black
                   uppercase
-                  hover:bg-foreground
+                  tracking-widest
+                  text-primary-foreground
                   transition-colors
                   duration-200
+                  hover:bg-foreground
                 "
                 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
                 }}
               >
                 リクエストコーナー
-              </a>
+              </button>
 
-              <a
-                href="#tour"
+              <button
+                type="button"
+                onClick={() => scrollToSection("tour")}
                 className="
                   inline-block
+                  cursor-pointer
                   border
                   border-foreground/30
-                  text-foreground
+                  bg-transparent
                   px-4
                   py-3
-                  font-bold
                   text-sm
-                  tracking-widest
+                  font-bold
                   uppercase
-                  hover:border-primary
-                  hover:text-primary
+                  tracking-widest
+                  text-foreground
                   transition-colors
                   duration-200
+                  hover:border-primary
+                  hover:text-primary
                 "
                 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
                 }}
               >
                 入部申込書 →
-              </a>
+              </button>
             </div>
           </div>
-
-          {/* Bottom strip */}
 
           <div
             className="
               relative
               z-10
-              bg-primary
               h-1.5
               w-full
+              bg-primary
             "
           />
         </section>
 
+        {/* ==================================================
+            ABOUT US / CONCEPT
+        ================================================== */}
+
         <section
           id="concept"
           className="
-            bg-background
             overflow-hidden
+            bg-background
+            scroll-mt-14
           "
         >
           <div className="w-full overflow-hidden">
@@ -310,11 +355,11 @@ export default function Home() {
             >
               <p
                 className="
+                  mr-20
                   whitespace-nowrap
                   font-black
                   uppercase
                   text-foreground
-                  mr-20
                 "
                 style={{
                   fontFamily: "'Big Shoulders Display', sans-serif",
@@ -327,11 +372,11 @@ export default function Home() {
 
               <p
                 className="
+                  mr-20
                   whitespace-nowrap
                   font-black
                   uppercase
                   text-foreground
-                  mr-20
                 "
                 style={{
                   fontFamily: "'Big Shoulders Display', sans-serif",
@@ -343,30 +388,30 @@ export default function Home() {
               </p>
             </div>
           </div>
+
           <div className="min-[1100px]:hidden">
             <Lunch />
           </div>
+          <div>
+            <Good />
+          </div>
         </section>
-
-        {/* ==================================================
-            DIVIDER IMAGE
-        ================================================== */}
 
         <div
           className="
             relative
             h-64
-            md:h-96
             overflow-hidden
             bg-[#04080f]
+            md:h-96
           "
         >
           <img
             src="https://images.unsplash.com/photo-1577648875929-894904f7b051?w=1600&h=600&fit=crop&auto=format"
             alt="Blue Diamond concert crowd"
             className="
-              w-full
               h-full
+              w-full
               object-cover
               opacity-40
             "
@@ -395,12 +440,12 @@ export default function Home() {
             <p
               className="
                 text-center
+                text-2xl
                 font-black
                 uppercase
-                text-foreground/90
-                text-2xl
-                md:text-5xl
                 tracking-widest
+                text-foreground/90
+                md:text-5xl
               "
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
@@ -422,32 +467,29 @@ export default function Home() {
           />
         </div>
 
-        {/* ==================================================
-            NEWS / LINEUP
-        ================================================== */}
-
         <section
           id="lineup"
           className="
-            py-24
-            md:py-36
             bg-secondary
+            py-24
+            scroll-mt-14
+            md:py-36
           "
         >
           <div className="px-6 md:px-16">
             <div
               className="
+                mb-4
                 flex
                 items-center
                 gap-5
-                mb-4
               "
             >
               <div
                 className="
                   text-[11px]
-                  tracking-[0.35em]
                   uppercase
+                  tracking-[0.35em]
                   text-primary
                 "
                 style={{
@@ -455,35 +497,35 @@ export default function Home() {
                   fontWeight: 700,
                 }}
               >
-                LINEUP
+                HEllO
               </div>
 
-              <div className="flex-1 h-px bg-border" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <h2
               className="
+                mb-16
+                text-5xl
                 font-black
                 uppercase
-                text-foreground
-                text-5xl
-                md:text-7xl
-                mb-16
-                md:mb-24
                 leading-none
+                text-foreground
+                md:mb-24
+                md:text-7xl
               "
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
               }}
             >
-              DISCOGRAPHY
+              MEMBER'S NOTE
             </h2>
 
             <div
               className="
                 grid
-                md:grid-cols-3
                 gap-4
+                md:grid-cols-1
                 md:gap-6
               "
             >
@@ -493,20 +535,18 @@ export default function Home() {
                   className="
                     group
                     cursor-pointer
-                    bg-card
+                    overflow-hidden
                     border
                     border-border
-                    hover:border-primary
+                    bg-card
                     transition-all
                     duration-300
-                    overflow-hidden
+                    hover:border-primary
                   "
                   onClick={() =>
                     setSelectedAlbum(selectedAlbum === i ? null : i)
                   }
                 >
-                  {/* Image */}
-
                   <div
                     className="
                       relative
@@ -519,24 +559,22 @@ export default function Home() {
                       src={album.img}
                       alt={album.title}
                       className="
-                        w-full
                         h-full
+                        w-full
                         object-cover
                         opacity-75
-                        group-hover:opacity-90
-                        group-hover:scale-105
                         transition-all
                         duration-500
+                        group-hover:scale-105
+                        group-hover:opacity-90
                       "
                     />
-
-                    {/* Tag */}
 
                     <div
                       className="
                         absolute
-                        top-4
                         left-4
+                        top-4
                         px-3
                         py-1
                         text-[10px]
@@ -552,8 +590,6 @@ export default function Home() {
                       {album.tag}
                     </div>
 
-                    {/* Number */}
-
                     <div
                       className="
                         absolute
@@ -561,8 +597,8 @@ export default function Home() {
                         right-4
                         text-6xl
                         font-black
-                        text-white/10
                         leading-none
+                        text-white/10
                       "
                       style={{
                         fontFamily: "'Big Shoulders Display', sans-serif",
@@ -572,15 +608,13 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Info */}
-
                   <div className="p-5 md:p-6">
                     <div
                       className="
+                        mb-1
                         text-[10px]
                         tracking-widest
                         text-muted-foreground
-                        mb-1
                       "
                       style={{
                         fontFamily: "'Barlow Condensed', sans-serif",
@@ -592,13 +626,13 @@ export default function Home() {
 
                     <h3
                       className="
-                        font-black
-                        text-foreground
-                        text-2xl
-                        uppercase
                         mb-2
-                        group-hover:text-primary
+                        text-2xl
+                        font-black
+                        uppercase
+                        text-foreground
                         transition-colors
+                        group-hover:text-primary
                       "
                       style={{
                         fontFamily: "'Big Shoulders Display', sans-serif",
@@ -609,9 +643,9 @@ export default function Home() {
 
                     <div
                       className="
+                        mb-4
                         text-[11px]
                         text-muted-foreground
-                        mb-4
                       "
                       style={{
                         fontFamily: "'Barlow Condensed', sans-serif",
@@ -620,19 +654,17 @@ export default function Home() {
                       {album.tracks} TRACKS
                     </div>
 
-                    {/* Description */}
-
                     {selectedAlbum === i && (
                       <p
                         className="
-                          text-sm
-                          text-muted-foreground
-                          leading-relaxed
                           mb-4
-                          font-light
                           border-t
                           border-border
                           pt-4
+                          text-sm
+                          font-light
+                          leading-relaxed
+                          text-muted-foreground
                         "
                       >
                         {album.desc}
@@ -640,17 +672,18 @@ export default function Home() {
                     )}
 
                     <button
+                      type="button"
                       className="
-                        text-[11px]
-                        tracking-widest
-                        uppercase
-                        font-bold
-                        text-primary
-                        hover:text-foreground
-                        transition-colors
                         flex
                         items-center
                         gap-2
+                        text-[11px]
+                        font-bold
+                        uppercase
+                        tracking-widest
+                        text-primary
+                        transition-colors
+                        hover:text-foreground
                       "
                       style={{
                         fontFamily: "'Barlow Condensed', sans-serif",
@@ -663,34 +696,63 @@ export default function Home() {
               ))}
             </div>
           </div>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "2rem",
+            }}
+          >
+            <button
+              type="button"
+              className="
+                          cursor-pointer
+                          border-0
+                          bg-primary
+                          px-4
+                          py-2
+                          text-[10px]
+                          font-black
+                          tracking-widest
+                          text-primary-foreground
+                          transition-colors
+                          duration-150
+                          hover:bg-foreground
+                        "
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+              }}
+            >
+              MORES →
+            </button>
+          </div>
         </section>
-
-        {/* ==================================================
-            MEMBER NOTE / TOUR
-        ================================================== */}
 
         <section
           id="tour"
           className="
-            py-24
-            md:py-36
             bg-background
+            py-24
+            scroll-mt-14
+            md:py-36
           "
         >
           <div className="px-6 md:px-16">
             <div
               className="
+                mb-4
                 flex
                 items-center
                 gap-5
-                mb-4
               "
             >
               <div
                 className="
                   text-[11px]
-                  tracking-[0.35em]
                   uppercase
+                  tracking-[0.35em]
                   text-primary
                 "
                 style={{
@@ -698,75 +760,57 @@ export default function Home() {
                   fontWeight: 700,
                 }}
               >
-                TOUR
+                BLUE DIAMOND
               </div>
 
-              <div className="flex-1 h-px bg-border" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <h2
               className="
+                mb-4
+                text-5xl
                 font-black
                 uppercase
-                text-foreground
-                text-5xl
-                md:text-7xl
-                mb-4
                 leading-none
+                text-foreground
+                md:text-7xl
               "
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
               }}
             >
-              LIVE 2026
+              NEWS
             </h2>
-
-            <p
-              className="
-                text-muted-foreground
-                text-sm
-                mb-16
-                font-light
-              "
-            >
-              World tour in support of <em>Crystalline</em>. Limited capacity
-              only.
-            </p>
 
             <div className="border-t border-border">
               {TOUR_DATES.map((show, i) => (
                 <div
                   key={i}
                   className="
+                    group
                     flex
                     flex-col
-                    sm:flex-row
-                    sm:items-center
                     gap-3
-                    sm:gap-0
-                    py-6
                     border-b
                     border-border
-                    group
-                    hover:bg-card
+                    px-0
+                    py-6
                     transition-colors
                     duration-150
-                    px-0
-                    hover:px-4
+                    hover:bg-card
+                    sm:flex-row
+                    sm:items-center
+                    sm:gap-0
                     md:hover:px-6
                   "
-                  style={{
-                    transition: "padding 0.2s, background 0.2s",
-                  }}
                 >
-                  {/* Date */}
-
                   <div
                     className="
-                      sm:w-44
+                      text-sm
                       font-bold
                       text-foreground
-                      text-sm
+                      sm:w-44
                     "
                     style={{
                       fontFamily: "'Barlow Condensed', sans-serif",
@@ -776,32 +820,9 @@ export default function Home() {
                     {show.date}
                   </div>
 
-                  {/* City */}
-
-                  <div className="sm:w-36">
-                    <span
-                      className="
-                        text-[10px]
-                        tracking-widest
-                        font-black
-                        px-2.5
-                        py-1
-                        bg-muted
-                        text-muted-foreground
-                      "
-                      style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
-                      }}
-                    >
-                      {show.city}
-                    </span>
-                  </div>
-
-                  {/* Venue */}
-
                   <div
                     className="
-                      flex-1
+                      flex-2
                       text-sm
                       font-light
                       text-foreground
@@ -810,99 +831,120 @@ export default function Home() {
                     {show.venue}
                   </div>
 
-                  {/* Status */}
-
-                  <div
-                    className="
-                      sm:text-right
-                      sm:w-36
-                    "
-                  >
-                    {show.status === "SOLD OUT" ? (
-                      <span
-                        className="
-                          text-[10px]
-                          tracking-widest
-                          font-bold
-                          text-muted-foreground/50
-                          line-through
-                        "
-                        style={{
-                          fontFamily: "'Barlow Condensed', sans-serif",
-                        }}
-                      >
-                        SOLD OUT
-                      </span>
-                    ) : show.status === "COMING SOON" ? (
-                      <span
-                        className="
-                          text-[10px]
-                          tracking-widest
-                          font-bold
-                          text-muted-foreground
-                        "
-                        style={{
-                          fontFamily: "'Barlow Condensed', sans-serif",
-                        }}
-                      >
-                        COMING SOON
-                      </span>
-                    ) : (
-                      <a
-                        href="#"
-                        className="
+                  <div className="sm:w-36 sm:text-right">
+                    <button
+                      type="button"
+                      className="
+                        cursor-pointer
                           inline-block
+                          border-0
                           bg-primary
-                          text-primary-foreground
-                          text-[10px]
-                          tracking-widest
-                          font-black
                           px-4
                           py-2
-                          hover:bg-foreground
+                          text-[10px]
+                          font-black
+                          tracking-widest
+                          text-primary-foreground
                           transition-colors
                           duration-150
+                          hover:bg-foreground
                         "
-                        style={{
-                          fontFamily: "'Barlow Condensed', sans-serif",
-                        }}
-                      >
-                        GET TICKETS →
-                      </a>
-                    )}
+                      style={{
+                        fontFamily: "'Barlow Condensed', sans-serif",
+                      }}
+                    >
+                      View Details→
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "2rem",
+            }}
+          >
+            <button
+              type="button"
+              className="
+                          cursor-pointer
+                          border-0
+                          bg-primary
+                          px-4
+                          py-2
+                          text-[10px]
+                          font-black
+                          tracking-widest
+                          text-primary-foreground
+                          transition-colors
+                          duration-150
+                          hover:bg-foreground
+                        "
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+              }}
+            >
+              MORES →
+            </button>
+          </div>
         </section>
-
-        {/* ==================================================
-            GALLERY
-        ================================================== */}
-
+        <div>
+          <div
+            style={{
+              fontFamily: "'Big Shoulders Display', sans-serif",
+              fontSize: "18rem",
+              letterSpacing: "-0.01em",
+              fontWeight: "bolder",
+              textAlign: "center",
+            }}
+          >
+            <span className="text-primary">B</span>
+            <span className="text-foreground">D</span>
+          </div>
+          <div
+            style={{
+              fontFamily: "'Big Shoulders Display', sans-serif",
+              fontSize: "8rem",
+              letterSpacing: "-0.01em",
+              fontWeight: "bolder",
+              textAlign: "center",
+            }}
+          >
+            <span className="text-foreground">BLUE</span>
+            <br></br>
+            <span className="text-primary">DIAMOND</span>
+            <br></br>
+            <span className="text-foreground">BAND</span>
+          </div>
+        </div>
         <section
           id="gallery"
           className="
-            py-24
-            md:py-36
             bg-secondary
+            py-24
+            scroll-mt-14
+            md:py-36
           "
         >
           <div className="px-6 md:px-16">
             <div
               className="
+                mb-4
                 flex
                 items-center
                 gap-5
-                mb-4
               "
             >
               <div
                 className="
                   text-[11px]
-                  tracking-[0.35em]
                   uppercase
+                  tracking-[0.35em]
                   text-primary
                 "
                 style={{
@@ -913,18 +955,18 @@ export default function Home() {
                 GALLERY
               </div>
 
-              <div className="flex-1 h-px bg-border" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <h2
               className="
+                mb-12
+                text-5xl
                 font-black
                 uppercase
-                text-foreground
-                text-5xl
-                md:text-7xl
-                mb-12
                 leading-none
+                text-foreground
+                md:text-7xl
               "
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
@@ -934,22 +976,20 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Masonry */}
-
           <div
             className="
               grid
               grid-cols-2
-              md:grid-cols-4
               gap-1
+              md:grid-cols-4
             "
           >
             <div
               className="
                 row-span-2
-                bg-muted
-                overflow-hidden
                 aspect-[2/3]
+                overflow-hidden
+                bg-muted
                 md:aspect-auto
               "
             >
@@ -957,14 +997,14 @@ export default function Home() {
                 src="https://images.unsplash.com/photo-1649772308558-db37c0dfae7e?w=600&h=900&fit=crop&auto=format"
                 alt="Performer at microphone"
                 className="
-                  w-full
                   h-full
+                  w-full
                   object-cover
                   opacity-80
-                  hover:opacity-100
-                  hover:scale-105
                   transition-all
                   duration-500
+                  hover:scale-105
+                  hover:opacity-100
                 "
               />
             </div>
@@ -972,69 +1012,69 @@ export default function Home() {
             <div
               className="
                 col-span-2
-                bg-muted
-                overflow-hidden
                 aspect-video
+                overflow-hidden
+                bg-muted
               "
             >
               <img
                 src="https://images.unsplash.com/photo-1577042816206-2e85c23f2392?w=900&h=500&fit=crop&auto=format"
                 alt="Band on stage"
                 className="
-                  w-full
                   h-full
+                  w-full
                   object-cover
                   opacity-80
-                  hover:opacity-100
-                  hover:scale-105
                   transition-all
                   duration-500
+                  hover:scale-105
+                  hover:opacity-100
                 "
               />
             </div>
 
             <div
               className="
-                bg-muted
-                overflow-hidden
                 aspect-square
+                overflow-hidden
+                bg-muted
               "
             >
               <img
                 src="https://images.unsplash.com/photo-1574155088851-0c770818ba40?w=500&h=500&fit=crop&auto=format"
                 alt="Concert crowd"
                 className="
-                  w-full
                   h-full
+                  w-full
                   object-cover
                   opacity-80
-                  hover:opacity-100
-                  hover:scale-105
                   transition-all
                   duration-500
+                  hover:scale-105
+                  hover:opacity-100
                 "
               />
             </div>
 
             <div
               className="
-                bg-muted
-                overflow-hidden
                 aspect-square
+                overflow-hidden
+                bg-muted
               "
             >
               <img
                 src="https://images.unsplash.com/photo-1509824227185-9c5a01ceba0d?w=500&h=500&fit=crop&auto=format"
                 alt="Concert celebration"
                 className="
-                  w-full
                   h-full
+                  w-full
                   object-cover
                   opacity-80
-                  hover:opacity-100
-                  hover:scale-105
                   transition-all
                   duration-500
+                  hover:scale-105
+                  hover:opacity-100
                 "
               />
             </div>
@@ -1042,23 +1082,23 @@ export default function Home() {
             <div
               className="
                 col-span-2
-                bg-muted
-                overflow-hidden
                 aspect-video
+                overflow-hidden
+                bg-muted
               "
             >
               <img
                 src="https://images.unsplash.com/photo-1765224747205-3c9c23f0553c?w=900&h=500&fit=crop&auto=format"
                 alt="Singer silhouette blue stage"
                 className="
-                  w-full
                   h-full
+                  w-full
                   object-cover
                   opacity-80
-                  hover:opacity-100
-                  hover:scale-105
                   transition-all
                   duration-500
+                  hover:scale-105
+                  hover:opacity-100
                 "
               />
             </div>
@@ -1072,25 +1112,26 @@ export default function Home() {
         <section
           id="contact"
           className="
-            py-24
-            md:py-36
             bg-background
+            py-24
+            scroll-mt-14
+            md:py-36
           "
         >
           <div className="px-6 md:px-16">
             <div
               className="
+                mb-4
                 flex
                 items-center
                 gap-5
-                mb-4
               "
             >
               <div
                 className="
                   text-[11px]
-                  tracking-[0.35em]
                   uppercase
+                  tracking-[0.35em]
                   text-primary
                 "
                 style={{
@@ -1101,18 +1142,18 @@ export default function Home() {
                 CONTACT
               </div>
 
-              <div className="flex-1 h-px bg-border" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <h2
               className="
+                mb-16
+                text-5xl
                 font-black
                 uppercase
-                text-foreground
-                text-5xl
-                md:text-7xl
-                mb-16
                 leading-none
+                text-foreground
+                md:text-7xl
               "
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
@@ -1126,27 +1167,24 @@ export default function Home() {
             <div
               className="
                 grid
-                md:grid-cols-2
                 gap-16
+                md:grid-cols-1
                 md:gap-24
               "
             >
-              {/* Contact info */}
+              {/* Contact information */}
 
               <div>
                 <div
                   className="
-                    border-t
-                    border-border
                     divide-y
                     divide-border
+                    border-t
+                    border-border
                   "
                 >
                   {[
-                    {
-                      role: "BOOKINGS",
-                      email: "bookings@bluediamond.band",
-                    },
+                    
                     {
                       role: "PRESS",
                       email: "press@bluediamond.band",
@@ -1155,26 +1193,23 @@ export default function Home() {
                       role: "GENERAL",
                       email: "hello@bluediamond.band",
                     },
-                    {
-                      role: "MANAGEMENT",
-                      email: "mgmt@bluediamond.band",
-                    },
+                    
                   ].map((c) => (
                     <div
                       key={c.role}
                       className="
+                        group
                         flex
                         items-center
                         justify-between
                         py-5
-                        group
                       "
                     >
                       <span
                         className="
                           text-[11px]
-                          tracking-widest
                           font-bold
+                          tracking-widest
                           text-muted-foreground
                         "
                         style={{
@@ -1188,10 +1223,10 @@ export default function Home() {
                         href={`mailto:${c.email}`}
                         className="
                           text-sm
-                          text-foreground
-                          hover:text-primary
-                          transition-colors
                           font-light
+                          text-foreground
+                          transition-colors
+                          hover:text-primary
                         "
                       >
                         {c.email}
@@ -1211,29 +1246,30 @@ export default function Home() {
                   "
                 >
                   {["INSTAGRAM", "SPOTIFY", "YOUTUBE", "BANDCAMP"].map((s) => (
-                    <a
+                    <button
                       key={s}
-                      href="#"
+                      type="button"
                       className="
-                        text-[10px]
-                        tracking-widest
-                        font-black
                         border
                         border-border
+                        bg-transparent
                         px-4
                         py-2
+                        text-[10px]
+                        font-black
+                        tracking-widest
                         text-muted-foreground
-                        hover:border-primary
-                        hover:text-primary
                         transition-all
                         duration-200
+                        hover:border-primary
+                        hover:text-primary
                       "
                       style={{
                         fontFamily: "'Barlow Condensed', sans-serif",
                       }}
                     >
                       {s}
-                    </a>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -1256,12 +1292,12 @@ export default function Home() {
                   <div key={f.label}>
                     <label
                       className="
+                        mb-2
                         block
                         text-[10px]
-                        tracking-widest
                         font-bold
+                        tracking-widest
                         text-muted-foreground
-                        mb-2
                       "
                       style={{
                         fontFamily: "'Barlow Condensed', sans-serif",
@@ -1275,16 +1311,16 @@ export default function Home() {
                       placeholder={f.placeholder}
                       className="
                         w-full
-                        bg-transparent
                         border-b
                         border-border
-                        focus:border-primary
-                        outline-none
+                        bg-transparent
                         py-3
                         text-sm
                         text-foreground
-                        placeholder:text-muted-foreground/40
+                        outline-none
                         transition-colors
+                        placeholder:text-muted-foreground/40
+                        focus:border-primary
                       "
                     />
                   </div>
@@ -1293,12 +1329,12 @@ export default function Home() {
                 <div>
                   <label
                     className="
+                      mb-2
                       block
                       text-[10px]
-                      tracking-widest
                       font-bold
+                      tracking-widest
                       text-muted-foreground
-                      mb-2
                     "
                     style={{
                       fontFamily: "'Barlow Condensed', sans-serif",
@@ -1312,17 +1348,17 @@ export default function Home() {
                     placeholder="Tell us about your inquiry..."
                     className="
                       w-full
-                      bg-transparent
+                      resize-none
                       border-b
                       border-border
-                      focus:border-primary
-                      outline-none
+                      bg-transparent
                       py-3
                       text-sm
                       text-foreground
-                      placeholder:text-muted-foreground/40
+                      outline-none
                       transition-colors
-                      resize-none
+                      placeholder:text-muted-foreground/40
+                      focus:border-primary
                     "
                   />
                 </div>
@@ -1331,16 +1367,16 @@ export default function Home() {
                   type="submit"
                   className="
                     bg-primary
-                    text-primary-foreground
                     px-8
                     py-4
                     text-sm
                     font-black
-                    tracking-widest
                     uppercase
-                    hover:bg-foreground
+                    tracking-widest
+                    text-primary-foreground
                     transition-colors
                     duration-200
+                    hover:bg-foreground
                   "
                   style={{
                     fontFamily: "'Barlow Condensed', sans-serif",
@@ -1361,21 +1397,21 @@ export default function Home() {
           className="
             border-t
             border-border
-            py-10
             bg-secondary
+            py-10
           "
         >
           <div
             className="
-              px-6
-              md:px-16
               flex
               flex-col
-              md:flex-row
               items-start
-              md:items-center
               justify-between
               gap-6
+              px-6
+              md:flex-row
+              md:items-center
+              md:px-16
             "
           >
             <div
@@ -1401,7 +1437,7 @@ export default function Home() {
                 fontFamily: "'Barlow Condensed', sans-serif",
               }}
             >
-              © 2026 BLUE DIAMOND — TOKYO / SEOUL. ALL RIGHTS RESERVED.
+              © 2026 BLUE DIAMOND — SAGA / JAPAN. ALL RIGHTS RESERVED.
             </div>
           </div>
         </footer>
@@ -1414,7 +1450,6 @@ export default function Home() {
       <style>{`
         html {
           scroll-behavior: smooth;
-          
         }
 
         ::-webkit-scrollbar {

@@ -18,6 +18,25 @@ export default function Template() {
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+
+    if (!element) {
+      console.log("Section not found:", id);
+      return;
+    }
+
+    setActiveSection(id);
+    setMenuOpen(false);
+
+    setTimeout(() => {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 50);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       const observer = new IntersectionObserver(
@@ -117,7 +136,7 @@ export default function Template() {
             {SECTIONS.map(({ id, label }) => (
               <a
                 key={id}
-                href={`#/${id}`}
+                onClick={() => scrollToSection(id)}
                 className={`
                   text-[10px]
 
@@ -136,7 +155,7 @@ export default function Template() {
                 `}
                 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
-
+                  cursor: "pointer",
                   fontWeight: 600,
                 }}
               >
@@ -300,31 +319,31 @@ export default function Template() {
       {menuOpen && (
         <div
           className="
-            flex
-            min-[1100px]:hidden
-            fixed
-            inset-0
-            z-40
-            h-dvh
-            w-full
-            flex-col
-            items-center
-            justify-center
-            gap-8
-            pt-14
-            bg-background/95
-            backdrop-blur-md
-          "
+      fixed
+      inset-0
+      z-[100]
+      flex
+      min-[1100px]:hidden
+      h-dvh
+      w-full
+      flex-col
+      items-center
+      justify-center
+      gap-8
+      bg-background/95
+      backdrop-blur-md
+    "
         >
           {SECTIONS.map(({ id, label }) => (
-            <a
+            <button
               key={id}
-              href={`#/${id}`}
-              onClick={() => {
-                setActiveSection(id);
-                setMenuOpen(false);
-              }}
+              type="button"
+              onClick={() => scrollToSection(id)}
               className={`
+      border-0
+      bg-transparent
+      p-0
+      cursor-pointer
       text-4xl
       font-black
       transition-colors
@@ -337,7 +356,7 @@ export default function Template() {
               }}
             >
               {label}
-            </a>
+            </button>
           ))}
         </div>
       )}
