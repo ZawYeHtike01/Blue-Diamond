@@ -116,9 +116,7 @@ export default function Home() {
         fontFamily: "'Barlow', sans-serif",
       }}
     >
-      {/* ==================================================
-          LOADING / INTRO
-      ================================================== */}
+    
 
       <div
         className="
@@ -152,9 +150,7 @@ export default function Home() {
       </div>
 
       <main className="lg:pr-14">
-        {/* ==================================================
-            TOP
-        ================================================== */}
+        
 
         <section
           id="top"
@@ -1107,9 +1103,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ==================================================
-            CONTACT
-        ================================================== */}
+        
 
         <section
           id="contact"

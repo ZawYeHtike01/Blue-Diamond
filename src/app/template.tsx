@@ -1,7 +1,7 @@
+
 import { Outlet } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Event from "./components/main_components/lunch_event";
-import { Link } from "react-router-dom";
 
 const SECTIONS = [
   { id: "top", label: "TOP" },
@@ -16,118 +16,99 @@ export default function Template() {
   const [activeSection, setActiveSection] = useState("top");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  // Scroll to a section on the current Home page.
+  const scrollToSection = (id: string) => {
+    setMenuOpen(false);
+    setActiveSection(id);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveSection(entry.target.id);
-            }
-          });
-        },
-        {
-          threshold: 0.5,
-        },
-      );
-
-      SECTIONS.forEach(({ id }) => {
-        const element = document.getElementById(id);
-
-        if (element) {
-          observer.observe(element);
-        }
+    // Wait for the menu state update before scrolling.
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
       });
+    });
+  };
 
-      observerRef.current = observer;
-    }, 100);
+  // Highlight the section currently visible on screen.
+  useEffect(() => {
+    const elements = SECTIONS.map(({ id }) =>
+      document.getElementById(id)
+    ).filter((element): element is HTMLElement => element !== null);
+
+    if (!("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.intersectionRatio - a.intersectionRatio
+          );
+
+        if (visibleEntries.length > 0) {
+          setActiveSection(visibleEntries[0].target.id);
+        }
+      },
+      {
+        threshold: [0.1, 0.25, 0.5, 0.75],
+        rootMargin: "-56px 0px -10% 0px",
+      }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Close the mobile menu when the Escape key is pressed.
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      clearTimeout(timer);
-      observerRef.current?.disconnect();
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [menuOpen]);
 
   return (
     <div className="min-h-screen w-full bg-background">
-      <div
-        className="
-          hidden
-          min-[1100px]:grid
-          min-[1100px]:grid-cols-7
-          min-h-screen
-        "
-      >
-        <div className="col-span-3">
-          <div
-            className="
-              sticky
-              top-0
-
-              h-screen
-
-              flex
-              flex-col
-              items-center
-              justify-center
-
-             
-            "
-          >
+      {/* DESKTOP GRID + SHARED PAGE CONTENT */}
+      <div className="min-h-screen w-full min-[1100px]:grid min-[1100px]:grid-cols-8">
+        {/* LEFT EVENT PANEL */}
+        <aside className="hidden min-[1100px]:col-span-3 min-[1100px]:block">
+          <div className="sticky top-0 flex h-screen items-center justify-center">
             <Event />
           </div>
-        </div>
+        </aside>
 
-        <main
-          className="
-            col-span-3
-            min-h-screen
-            w-full
-          "
-        >
+        {/* ONE OUTLET ONLY: Home.tsx */}
+        <main className="w-full min-h-screen pt-14 min-[1100px]:col-span-4 min-[1100px]:pt-0">
           <Outlet />
         </main>
 
-        <div className="col-span-1">
-          <nav
-            className="
-              sticky
-              top-0
-
-              h-screen
-
-              flex
-              flex-col
-
-              items-center
-              justify-center
-
-              gap-10
-
-              border-l
-              border-border
-
-              bg-background/80
-
-              backdrop-blur-sm
-            "
-          >
+        {/* DESKTOP RIGHT NAVIGATION */}
+        <aside className="hidden min-[1100px]:col-span-1 min-[1100px]:block">
+          <nav className="sticky top-0 flex h-screen flex-col items-center justify-center gap-10  bg-background/80 backdrop-blur-sm">
             {SECTIONS.map(({ id, label }) => (
-              <a
+              <button
                 key={id}
-                href={`#/${id}`}
+                type="button"
+                
+                onClick={() => scrollToSection(id)}
+                aria-current={activeSection === id ? "location" : undefined}
                 className={`
-                  text-[10px]
-
-                  tracking-[0.2em]
-
-                  transition-colors
-                  duration-200
-
+                  text-[10px] tracking-[0.2em]
+                  transition-colors duration-200
                   hover:text-primary
-
                   ${
                     activeSection === id
                       ? "text-primary"
@@ -136,210 +117,91 @@ export default function Template() {
                 `}
                 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
-
                   fontWeight: 600,
+                  cursor:"pointer"
                 }}
               >
                 {label}
-              </a>
+              </button>
             ))}
 
-            {/* Bottom line */}
-
-            <div
-              className="
-                absolute
-
-                bottom-0
-                left-1/2
-
-                -translate-x-1/2
-
-                w-px
-                h-16
-
-                bg-primary
-
-                opacity-60
-              "
-            />
+            <div className="absolute bottom-0 left-1/2 h-16 w-px -translate-x-1/2 bg-primary opacity-60" />
           </nav>
-        </div>
+        </aside>
       </div>
 
-      <main
-        className="
-          block
-          min-[1100px]:hidden
-
-          w-full
-          min-h-screen
-
-          pt-14
-        "
-      >
-        <Outlet />
-      </main>
-
-      <header
-        className="
-          flex
-          min-[1100px]:hidden
-
-          fixed
-
-          top-0
-          left-0
-          right-0
-
-          z-50
-
-          h-14
-          w-full
-
-          items-center
-          justify-between
-
-          px-5
-
-          bg-background/90
-          backdrop-blur-sm
-
-          border-b
-          border-border
-        "
-      >
-        <span
-          className="
-            text-lg
-            font-black
-            tracking-tight
-            text-foreground
-          "
+      {/* MOBILE HEADER */}
+      <header className="fixed left-0 right-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-border bg-background/90 px-5 backdrop-blur-sm min-[1100px]:hidden">
+        <button
+          type="button"
+          onClick={() => scrollToSection("top")}
+          className="text-lg font-black tracking-tight text-foreground"
           style={{
             fontFamily: "'Big Shoulders Display', sans-serif",
           }}
         >
           BLUE DIAMOND
-        </span>
+        </button>
 
         <button
           type="button"
           onClick={() => setMenuOpen((prev) => !prev)}
-          className="
-            flex
-            flex-col
-
-            gap-1.5
-
-            p-2
-          "
-          aria-label="Menu"
+          className="flex flex-col gap-1.5 p-2"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
+          aria-controls="mobile-navigation"
         >
-          {/* Top */}
-
           <span
-            className={`
-              block
-
-              w-6
-              h-0.5
-
-              bg-foreground
-
-              origin-center
-
-              transition-all
-              duration-300
-
-              ${menuOpen ? "rotate-45 translate-y-2" : ""}
-            `}
+            className={`block h-0.5 w-6 origin-center bg-foreground transition-all duration-300 ${
+              menuOpen ? "translate-y-2 rotate-45" : ""
+            }`}
           />
 
-          {/* Middle */}
-
           <span
-            className={`
-              block
-
-              w-6
-              h-0.5
-
-              bg-foreground
-
-              transition-opacity
-              duration-200
-
-              ${menuOpen ? "opacity-0" : "opacity-100"}
-            `}
+            className={`block h-0.5 w-6 bg-foreground transition-opacity duration-200 ${
+              menuOpen ? "opacity-0" : "opacity-100"
+            }`}
           />
 
-          {/* Bottom */}
-
           <span
-            className={`
-              block
-
-              w-6
-              h-0.5
-
-              bg-foreground
-
-              origin-center
-
-              transition-all
-              duration-300
-
-              ${menuOpen ? "-rotate-45 -translate-y-2" : ""}
-            `}
+            className={`block h-0.5 w-6 origin-center bg-foreground transition-all duration-300 ${
+              menuOpen ? "-translate-y-2 -rotate-45" : ""
+            }`}
           />
         </button>
       </header>
 
+      {/* MOBILE MENU */}
       {menuOpen && (
-        <div
-          className="
-            flex
-            min-[1100px]:hidden
-            fixed
-            inset-0
-            z-40
-            h-dvh
-            w-full
-            flex-col
-            items-center
-            justify-center
-            gap-8
-            pt-14
-            bg-background/95
-            backdrop-blur-md
-          "
+        <nav
+          id="mobile-navigation"
+          aria-label="Mobile navigation"
+          className="fixed inset-0 z-40 flex h-dvh w-full flex-col items-center justify-center gap-8 bg-background/95 pt-14 backdrop-blur-md min-[1100px]:hidden"
         >
           {SECTIONS.map(({ id, label }) => (
-            <a
+            <button
               key={id}
-              href={`#/${id}`}
-              onClick={() => {
-                setActiveSection(id);
-                setMenuOpen(false);
-              }}
+              type="button"
+              onClick={() => scrollToSection(id)}
+              aria-current={activeSection === id ? "location" : undefined}
               className={`
-      text-4xl
-      font-black
-      transition-colors
-      duration-200
-      hover:text-primary
-      ${activeSection === id ? "text-primary" : "text-foreground"}
-    `}
+                text-4xl font-black
+                transition-colors duration-200
+                hover:text-primary
+                ${
+                  activeSection === id
+                    ? "text-primary"
+                    : "text-foreground"
+                }
+              `}
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
               }}
             >
               {label}
-            </a>
+            </button>
           ))}
-        </div>
+        </nav>
       )}
     </div>
   );
