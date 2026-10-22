@@ -1,4 +1,5 @@
 import React from "react";
+import Revel from "../../Reveal";
 
 type Feature = {
   title: string;
@@ -12,24 +13,21 @@ const FEATURES: Feature[] = [
   {
     title: "コミュニケーションが良い",
     description: "メンバー同士がよく話し合い、\n協力して活動できます。",
-    image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600",
     position: "left",
     rotate: "-rotate-[12deg]",
   },
   {
     title: "プロ意識が高い",
     description: "責任感を持ち、\n真面目に練習や演奏に取り組みます。",
-    image:
-      "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=600",
+    image: "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=600",
     position: "right",
     rotate: "rotate-[12deg]",
   },
   {
     title: "良いイメージがある",
     description: "学校やバンドの\n良い印象を与えることができます。",
-    image:
-      "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600",
+    image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600",
     position: "left",
     rotate: "-rotate-[12deg]",
   },
@@ -54,7 +52,6 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
         ${isLeft ? "justify-start" : "justify-end"}
       `}
     >
-      {/* Image */}
       <div
         className={`
           relative z-10
@@ -135,10 +132,9 @@ const CommunicationSection: React.FC = () => {
       <div className="mx-auto max-w-[450px]">
         <div className="flex flex-col gap-[115px]">
           {FEATURES.map((feature) => (
-            <FeatureCard
-              key={feature.title}
-              feature={feature}
-            />
+            <Revel direction="up" delay={0.2}>
+              <FeatureCard key={feature.title} feature={feature} />
+            </Revel>
           ))}
         </div>
       </div>

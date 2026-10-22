@@ -142,7 +142,7 @@ export default function Home() {
       </div>
 
       <main className="lg:pr-14">
-        {/* HERO */}
+        
 
         <section
           id="top"
@@ -329,7 +329,7 @@ export default function Home() {
           />
         </section>
 
-        {/* ABOUT US / CONCEPT */}
+        
 
         <section
           id="about_us"
@@ -383,7 +383,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Reveal>
+          <Reveal direction="up">
             <div className="min-[1100px]:hidden">
               <Lunch />
             </div>
@@ -1216,11 +1216,11 @@ export default function Home() {
                     {[
                       {
                         role: "PRESS",
-                        email: "press@bluediamond.band",
+                        email: "bluediamond.sajotan@gmail.com",
                       },
                       {
                         role: "GENERAL",
-                        email: "hello@bluediamond.band",
+                        email: "bluediamond.sajotan@gmail.com",
                       },
                     ].map((c) => (
                       <div
