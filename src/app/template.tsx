@@ -1,7 +1,7 @@
-
 import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Event from "./components/main_components/lunch_event";
+import { useApp } from "./App";
 
 const SECTIONS = [
   { id: "top", label: "TOP" },
@@ -15,6 +15,17 @@ const SECTIONS = [
 export default function Template() {
   const [activeSection, setActiveSection] = useState("top");
   const [menuOpen, setMenuOpen] = useState(false);
+  const { globalMsg, setGlobalMsg } = useApp();
+
+  useEffect(() => {
+    if (!globalMsg) return;
+
+    const timer = window.setTimeout(() => {
+      setGlobalMsg(null);
+    }, 6000);
+
+    return () => window.clearTimeout(timer);
+  }, [globalMsg, setGlobalMsg]);
 
   // Scroll to a section on the current Home page.
   const scrollToSection = (id: string) => {
@@ -33,7 +44,7 @@ export default function Template() {
   // Highlight the section currently visible on screen.
   useEffect(() => {
     const elements = SECTIONS.map(({ id }) =>
-      document.getElementById(id)
+      document.getElementById(id),
     ).filter((element): element is HTMLElement => element !== null);
 
     if (!("IntersectionObserver" in window)) return;
@@ -42,10 +53,7 @@ export default function Template() {
       (entries) => {
         const visibleEntries = entries
           .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              b.intersectionRatio - a.intersectionRatio
-          );
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
 
         if (visibleEntries.length > 0) {
           setActiveSection(visibleEntries[0].target.id);
@@ -54,7 +62,7 @@ export default function Template() {
       {
         threshold: [0.1, 0.25, 0.5, 0.75],
         rootMargin: "-56px 0px -10% 0px",
-      }
+      },
     );
 
     elements.forEach((element) => observer.observe(element));
@@ -102,7 +110,6 @@ export default function Template() {
               <button
                 key={id}
                 type="button"
-                
                 onClick={() => scrollToSection(id)}
                 aria-current={activeSection === id ? "location" : undefined}
                 className={`
@@ -118,7 +125,7 @@ export default function Template() {
                 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 600,
-                  cursor:"pointer"
+                  cursor: "pointer",
                 }}
               >
                 {label}
@@ -188,11 +195,7 @@ export default function Template() {
                 text-4xl font-black
                 transition-colors duration-200
                 hover:text-primary
-                ${
-                  activeSection === id
-                    ? "text-primary"
-                    : "text-foreground"
-                }
+                ${activeSection === id ? "text-primary" : "text-foreground"}
               `}
               style={{
                 fontFamily: "'Big Shoulders Display', sans-serif",
@@ -202,6 +205,32 @@ export default function Template() {
             </button>
           ))}
         </nav>
+      )}
+      {globalMsg && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="
+            fixed bottom-4 left-1/2 z-[10000]
+            flex w-[calc(100%-2rem)] max-w-md
+            -translate-x-1/2 items-center justify-between
+            gap-3 rounded-xl border border-slate-700
+            bg-slate-900 px-4 py-3
+            text-sm text-white shadow-2xl
+            sm:bottom-6
+          "
+        >
+          <span className="min-w-0 break-words">{globalMsg}</span>
+
+          <button
+            type="button"
+            onClick={() => setGlobalMsg(null)}
+            aria-label="Close notification"
+            className="shrink-0 text-slate-400 transition hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
       )}
     </div>
   );

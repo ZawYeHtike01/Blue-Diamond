@@ -1469,6 +1469,8 @@ export default function Home() {
               }}
             >
               © 2026 BLUE DIAMOND — SAGA / JAPAN. ALL RIGHTS RESERVED.
+              <br/>
+              Developed By Zaw Ye Htike
             </div>
           </div>
         </footer>

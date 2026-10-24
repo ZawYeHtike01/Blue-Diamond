@@ -1,4 +1,10 @@
 import Reveal from "../../Reveal";
+import { db } from "../../../firebase/firebase";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 export default function lunch_event() {
   const getWeekDates = () => {
     const today = new Date();
