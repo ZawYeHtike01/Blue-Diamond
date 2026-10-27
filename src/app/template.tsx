@@ -206,21 +206,28 @@ export default function Template() {
           ))}
         </nav>
       )}
+
       {globalMsg && (
         <div
           role="status"
           aria-live="polite"
-          className="
-            fixed bottom-4 left-1/2 z-[10000]
-            flex w-[calc(100%-2rem)] max-w-md
-            -translate-x-1/2 items-center justify-between
-            gap-3 rounded-xl border border-slate-700
-            bg-slate-900 px-4 py-3
-            text-sm text-white shadow-2xl
-            sm:bottom-6
-          "
+          className={`
+      fixed bottom-4 left-1/2 z-[10000]
+      flex w-[calc(100%-2rem)] max-w-md
+      -translate-x-1/2 items-center justify-between
+      gap-3 rounded-xl border px-4 py-3
+      text-sm text-white shadow-2xl
+      sm:bottom-6
+      ${
+        typeof globalMsg === "object" && globalMsg.type === "error"
+          ? "border-red-700 bg-red-950"
+          : "border-slate-700 bg-slate-900"
+      }
+    `}
         >
-          <span className="min-w-0 break-words">{globalMsg}</span>
+          <span className="min-w-0 break-words">
+            {typeof globalMsg === "string" ? globalMsg : globalMsg.message}
+          </span>
 
           <button
             type="button"
@@ -232,6 +239,29 @@ export default function Template() {
           </button>
         </div>
       )}
+      <style>{`
+        html {
+          scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar {
+          width: 3px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: #3b82f6;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          html {
+            scroll-behavior: auto;
+          }
+        }
+      `}</style>
     </div>
   );
 }

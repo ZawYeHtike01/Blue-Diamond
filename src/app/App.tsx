@@ -8,7 +8,10 @@ import Template from "./template";
 import { useEffect } from "react";
 import AdminHome from "./admin/Admn_home";
 import Login from "./admin/Login";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import ProtectedRoute from "../ProtecedRoute";
+import AddLunchEvent from "./admin/addLunchEvent";
+import LunchEventList from "./admin/lunchEventList";
 
 const AppContext = createContext();
 
@@ -34,6 +37,22 @@ const routes = [
           </ProtectedRoute>
         ),
       },
+      {
+        path: "/admin/luncheventlist/submit",
+        element: (
+          <ProtectedRoute>
+            <AddLunchEvent />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/luncheventlist",
+        element: (
+          <ProtectedRoute>
+            <LunchEventList />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ];
@@ -46,6 +65,22 @@ export function useApp() {
 function App() {
   const [eventDate, setEventDate] = useState(new Date());
   const [globalMsg, setGlobalMsg] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [weeklyEvents, setWeeklyEvents] = useState([]);
+
+  interface LunchEvent {
+    id: string;
+    date: string; // YYYY-MM-DD
+    songName: string;
+    artistName: string;
+    remark?: string;
+  }
+
+  interface AppContextType {
+    weeklyEvents: LunchEvent[];
+    setWeeklyEvents: React.Dispatch<React.SetStateAction<LunchEvent[]>>;
+  }
+
   return (
     <AppContext.Provider
       value={{
@@ -53,6 +88,10 @@ function App() {
         setEventDate,
         globalMsg,
         setGlobalMsg,
+        user,
+        setUser,
+        weeklyEvents,
+        setWeeklyEvents,
       }}
     >
       <RouterProvider router={router} />

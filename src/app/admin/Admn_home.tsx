@@ -3,6 +3,7 @@ import Lunch from "../components/main_components/lunch_event";
 import Good from "../components/main_components/goodthings";
 import Reveal from "../Reveal";
 import { motion } from "motion/react";
+import { useNavigate } from "react-router-dom";
 
 const ALBUMS = [
   {
@@ -82,6 +83,7 @@ const TOUR_DATES = [
 
 export default function AdminHome() {
   const [selectedAlbum, setSelectedAlbum] = useState<number | null>(null);
+  const navigate=useNavigate();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -288,8 +290,8 @@ export default function AdminHome() {
                 </button>
 
                 <button
-                  type="button"
-                  onClick={() => scrollToSection("tour")}
+                  type="button" 
+                  onClick={()=>navigate("/admin/luncheventlist")}
                   className="
                     inline-block
                     cursor-pointer
@@ -312,7 +314,7 @@ export default function AdminHome() {
                     fontFamily: "'Barlow Condensed', sans-serif",
                   }}
                 >
-                  入部申込書 →
+                  Add Lunch Event
                 </button>
               </div>
             </Reveal>

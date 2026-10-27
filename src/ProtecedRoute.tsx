@@ -2,7 +2,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { onAuthStateChanged, type User } from "firebase/auth";
-
+import { useApp } from "./app/App";
 import { auth } from "./firebase/firebase";
 
 type ProtectedRouteProps = {
@@ -12,7 +12,7 @@ type ProtectedRouteProps = {
 export default function ProtectedRoute({
   children,
 }: ProtectedRouteProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const {user,setUser}=useApp();
   const [checking, setChecking] = useState(true);
   const location = useLocation();
 
