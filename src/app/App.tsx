@@ -132,9 +132,9 @@ const routes = [
       {
         path: "/admin/newdetails/:id",
         element: (
-          <ProtectedRoute>
+          
             <NewsDetails />
-          </ProtectedRoute>
+          
         ),
       },
     ],
