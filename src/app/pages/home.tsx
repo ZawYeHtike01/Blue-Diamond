@@ -1,8 +1,20 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+} from "firebase/firestore";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import Lunch from "../components/main_components/lunch_event";
 import Good from "../components/main_components/goodthings";
 import Reveal from "../Reveal";
 import { motion } from "motion/react";
+import { useNavigate } from "react-router-dom";
+import { db } from "../../firebase/firebase";
+import { useApp } from "../App";
 
 const ALBUMS = [
   {
@@ -40,62 +52,128 @@ const ALBUMS = [
   },
 ];
 
-const TOUR_DATES = [
-  {
-    date: "2026.08.14",
-    venue:
-      "The debut single that introduced Blue Diamond to the world. Still devastating.",
-    city: "TOKYO",
-    status: "SOLD OUT",
-  },
-  {
-    date: "2026.08.21",
-    venue: "Zepp Osaka Bayside",
-    city: "OSAKA",
-    status: "ON SALE",
-  },
-  {
-    date: "2026.09.05",
-    venue: "The Roundhouse",
-    city: "LONDON",
-    status: "ON SALE",
-  },
-  {
-    date: "2026.09.12",
-    venue: "Ancienne Belgique",
-    city: "BRUSSELS",
-    status: "ON SALE",
-  },
-  {
-    date: "2026.10.03",
-    venue: "Webster Hall",
-    city: "NEW YORK",
-    status: "COMING SOON",
-  },
-  {
-    date: "2026.10.18",
-    venue: "The Fillmore",
-    city: "SAN FRANCISCO",
-    status: "COMING SOON",
-  },
-];
 
+const PAGE_SIZE = 2;
 export default function Home() {
   const [selectedAlbum, setSelectedAlbum] = useState<number | null>(null);
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-
-    if (!element) {
-      console.log("Section not found:", id);
-      return;
-    }
-
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
+    const [newsLoading, setNewsLoading] = useState(false);
+    const loadingRef = useRef(false);
+    const navigate = useNavigate();
+  
+    const {
+      news,
+      setNews,
+      lastNewsDoc,
+      setLastNewsDoc,
+      hasMoreNews,
+      setHasMoreNews,
+      newsLoaded,
+      setNewsLoaded,
+    } = useApp();
+  
+    const loadNews = useCallback(async () => {
+      if (loadingRef.current || !hasMoreNews) return;
+  
+      loadingRef.current = true;
+      setNewsLoading(true);
+  
+      try {
+        const newsQuery = lastNewsDoc
+          ? query(
+              collection(db, "news"),
+              orderBy("createdAt", "desc"),
+              startAfter(lastNewsDoc),
+              limit(PAGE_SIZE),
+            )
+          : query(
+              collection(db, "news"),
+              orderBy("createdAt", "desc"),
+              limit(PAGE_SIZE),
+            );
+  
+        const snapshot = await getDocs(newsQuery);
+  
+        const newItems = snapshot.docs.map((newsDoc) => {
+          const data = newsDoc.data();
+  
+          return {
+            id: newsDoc.id,
+            title: typeof data.title === "string" ? data.title : "",
+            details: typeof data.details === "string" ? data.details : "",
+            author: typeof data.author === "string" ? data.author : "",
+            authorUid: typeof data.authorUid === "string" ? data.authorUid : "",
+            imageUrl: typeof data.imageUrl === "string" ? data.imageUrl : "",
+            imageFileId:
+              typeof data.imageFileId === "string" ? data.imageFileId : "",
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : null,
+            updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : null,
+          };
+        });
+  
+        setNews((previous) => {
+          const existingIds = new Set(previous.map((item) => item.id));
+          return [
+            ...previous,
+            ...newItems.filter((item) => !existingIds.has(item.id)),
+          ];
+        });
+  
+        if (snapshot.docs.length > 0) {
+          setLastNewsDoc(
+            snapshot.docs[
+              snapshot.docs.length - 1
+            ] as QueryDocumentSnapshot<DocumentData>,
+          );
+        }
+  
+        setHasMoreNews(snapshot.docs.length === PAGE_SIZE);
+        setNewsLoaded(true);
+      } catch (error) {
+        console.error("Failed to load news:", error);
+      } finally {
+        loadingRef.current = false;
+        setNewsLoading(false);
+      }
+    }, [
+      hasMoreNews,
+      lastNewsDoc,
+      setNews,
+      setLastNewsDoc,
+      setHasMoreNews,
+      setNewsLoaded,
+    ]);
+  
+    useEffect(() => {
+      if (!newsLoaded) {
+        void loadNews();
+      }
+    }, [newsLoaded, loadNews]);
+  
+    const formatNewsDate = (date: Date | null) => {
+      if (!date) return "DATE UNAVAILABLE";
+  
+      return date
+        .toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .replaceAll("/", ".");
+    };
+  
+    const scrollToSection = (id: string) => {
+      const element = document.getElementById(id);
+  
+      if (!element) {
+        console.log("Section not found:", id);
+        return;
+      }
+  
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    };
 
   return (
     <div
@@ -480,118 +558,128 @@ export default function Home() {
         {/* NEWS */}
 
         <section
-          id="news"
-          className="
-            bg-background
-            py-24
-            scroll-mt-14
-            md:py-36
-          "
-        >
-          <div className="px-6 md:px-16">
-            <Reveal>
-              <div
-                className="
-                  mb-4
-                  flex
-                  items-center
-                  gap-5
-                "
-              >
-                <div
-                  className="
-                    text-[11px]
-                    uppercase
-                    tracking-[0.35em]
-                    text-primary
-                  "
-                  style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 700,
-                  }}
+                  id="news"
+                  className="bg-background py-24 scroll-mt-14 md:py-36"
                 >
-                  BLUE DIAMOND
-                </div>
-
-                <div className="h-px flex-1 bg-border" />
-              </div>
-
-              <h2
-                className="
-                  mb-4
-                  text-5xl
-                  font-black
-                  uppercase
-                  leading-none
-                  text-foreground
-                  md:text-7xl
-                "
-                style={{
-                  fontFamily: "'Big Shoulders Display', sans-serif",
-                }}
-              >
-                NEWS
-              </h2>
-            </Reveal>
-
-            <div className="border-t border-border">
-              {TOUR_DATES.map((show, i) => (
-                <Reveal
-                  key={i}
-                  delay={i * 0.07}
-                  direction="up"
-                >
-                  <div
-                    className="
-                      group
-                      flex
-                      flex-col
-                      gap-3
-                      border-b
-                      border-border
-                      px-0
-                      py-6
-                      transition-colors
-                      duration-150
-                      hover:bg-card
-                      sm:flex-row
-                      sm:items-center
-                      sm:gap-0
-                      md:hover:px-6
-                    "
-                  >
-                    <div
-                      className="
-                        text-sm
-                        font-bold
-                        text-foreground
-                        sm:w-44
-                      "
-                      style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
-                        letterSpacing: "0.05em",
-                      }}
-                    >
-                      {show.date}
+                  <div className="px-6 md:px-16">
+                    <Reveal>
+                      <div className="mb-4 flex items-center gap-5">
+                        <div
+                          className="text-[11px] uppercase tracking-[0.35em] text-primary"
+                          style={{
+                            fontFamily: "'Barlow Condensed', sans-serif",
+                            fontWeight: 700,
+                          }}
+                        >
+                          BLUE DIAMOND
+                        </div>
+        
+                        <div className="h-px flex-1 bg-border" />
+                      </div>
+        
+                      {/* NEWS title + MORE button */}
+        
+                      <div className="mb-4 flex items-center justify-between gap-4">
+                        <h2
+                          className="
+                            text-5xl font-black uppercase
+                            leading-none text-foreground md:text-7xl
+                          "
+                          style={{
+                            fontFamily: "'Big Shoulders Display', sans-serif",
+                          }}
+                        >
+                          NEWS
+                        </h2>
+                      </div>
+                    </Reveal>
+        
+                    <div className="border-t border-border">
+                      {news.length === 0 && newsLoading ? (
+                        <div className="border-b border-border py-6 text-sm text-muted-foreground">
+                          Loading news...
+                        </div>
+                      ) : news.length === 0 ? (
+                        <div className="border-b border-border py-6 text-sm text-muted-foreground">
+                          No news available.
+                        </div>
+                      ) : (
+                        news.map((item, i) => (
+                          <Reveal
+                            key={item.id}
+                            delay={Math.min(i % PAGE_SIZE, 5) * 0.03}
+                            direction="up"
+                          >
+                            <div
+                              className="
+                                group flex flex-col gap-3
+                                border-b border-border px-0 py-6
+                                transition-colors duration-150
+                                hover:bg-card sm:flex-row
+                                sm:items-start sm:gap-0 md:hover:px-6
+                              "
+                            >
+                              <div
+                                className="
+                                  text-sm font-bold text-foreground
+                                  sm:w-44 sm:shrink-0
+                                "
+                                style={{
+                                  fontFamily: "'Barlow Condensed', sans-serif",
+                                  letterSpacing: "0.05em",
+                                }}
+                              >
+                                {formatNewsDate(item.createdAt)}
+                              </div>
+        
+                              <div className="min-w-0 flex-1">
+                                <h3 className="mb-2 text-sm font-bold text-foreground">
+                                  {item.title}
+                                </h3>
+        
+                                
+                              </div>
+        
+                              <div className="sm:w-36 sm:shrink-0 sm:text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(`/admin/newdetails/${item.id}`)}
+                                  className="
+                                    inline-block cursor-pointer border-0
+                                    bg-primary px-4 py-2 text-[10px]
+                                    font-black tracking-widest
+                                    text-primary-foreground transition-colors
+                                    duration-150 hover:bg-foreground
+                                  "
+                                  style={{
+                                    fontFamily: "'Barlow Condensed', sans-serif",
+                                  }}
+                                >
+                                  View Details →
+                                </button>
+                              </div>
+                            </div>
+                          </Reveal>
+                        ))
+                      )}
                     </div>
-
-                    <div
-                      className="
-                        flex-2
-                        text-sm
-                        font-light
-                        text-foreground
-                      "
-                    >
-                      {show.venue}
-                    </div>
-
-                    <div className="sm:w-36 sm:text-right">
-                      <button
-                        type="button"
-                        className="
+                    {hasMoreNews && (
+                      <Reveal delay={0.1}>
+                        <div
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: "2rem",
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => void loadNews()}
+                            disabled={newsLoading}
+                            className="
                           cursor-pointer
-                          inline-block
                           border-0
                           bg-primary
                           px-4
@@ -604,54 +692,17 @@ export default function Home() {
                           duration-150
                           hover:bg-foreground
                         "
-                        style={{
-                          fontFamily: "'Barlow Condensed', sans-serif",
-                        }}
-                      >
-                        View Details→
-                      </button>
-                    </div>
+                            style={{
+                              fontFamily: "'Barlow Condensed', sans-serif",
+                            }}
+                          >
+                            {newsLoading ? "LOADING..." : "MORE →"}
+                          </button>
+                        </div>
+                      </Reveal>
+                    )}
                   </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-
-          <Reveal delay={0.1}>
-            <div
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: "2rem",
-              }}
-            >
-              <button
-                type="button"
-                className="
-                  cursor-pointer
-                  border-0
-                  bg-primary
-                  px-4
-                  py-2
-                  text-[10px]
-                  font-black
-                  tracking-widest
-                  text-primary-foreground
-                  transition-colors
-                  duration-150
-                  hover:bg-foreground
-                "
-                style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                }}
-              >
-                MORES →
-              </button>
-            </div>
-          </Reveal>
-        </section>
+                </section>
 
         {/* MEMBER'S NOTE */}
 
