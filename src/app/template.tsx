@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Event from "./components/main_components/lunch_event";
 import { useApp } from "./App";
+import { useNavigate } from "react-router-dom";
 
 const SECTIONS = [
   { id: "top", label: "TOP" },
@@ -13,9 +14,10 @@ const SECTIONS = [
 ];
 
 export default function Template() {
-  const [activeSection, setActiveSection] = useState("top");
+  const [activeSection, setActiveSection] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const { globalMsg, setGlobalMsg } = useApp();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!globalMsg) return;
@@ -131,7 +133,23 @@ export default function Template() {
                 {label}
               </button>
             ))}
-
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className={`
+    text-[10px] tracking-[0.2em]
+    transition-colors duration-200
+    hover:text-primary
+    text-muted-foreground
+  `}
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              LOGIN
+            </button>
             <div className="absolute bottom-0 left-1/2 h-16 w-px -translate-x-1/2 bg-primary opacity-60" />
           </nav>
         </aside>
@@ -204,6 +222,24 @@ export default function Template() {
               {label}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              navigate("/login");
+            }}
+            className={`
+    text-4xl font-black
+    transition-colors duration-200
+    hover:text-primary
+    text-foreground
+  `}
+            style={{
+              fontFamily: "'Big Shoulders Display', sans-serif",
+            }}
+          >
+            LOGIN
+          </button>
         </nav>
       )}
 

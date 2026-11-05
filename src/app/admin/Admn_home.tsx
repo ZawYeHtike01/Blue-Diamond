@@ -275,7 +275,7 @@ export default function AdminHome() {
               <div className="flex flex-wrap items-center gap-4 md:gap-8">
                 <button
                   type="button"
-                  onClick={() => scrollToSection("lineup")}
+                  onClick={() =>  navigate("/admin/musicrequestlist")}
                   className="
                     inline-block cursor-pointer border-0
                     bg-primary px-2 py-4 text-sm

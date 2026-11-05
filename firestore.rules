@@ -6,20 +6,14 @@ service cloud.firestore {
 
     // Lunch Events
     match /lunchEvents/{eventId} {
-      // Anyone can read lunch events.
       allow read: if true;
-
-      // Only authenticated users can create, update, or delete.
       allow create, update, delete: if request.auth != null;
     }
 
     // News / Announcements
     match /news/{newsId} {
-      // Anyone can read news without logging in.
       allow read: if true;
 
-      // Authenticated users can create news documents
-      // only under their own authenticated UID.
       allow create: if request.auth != null
         && request.resource.data.authorUid == request.auth.uid
         && request.resource.data.title is string
@@ -28,7 +22,6 @@ service cloud.firestore {
         && request.resource.data.imageUrl is string
         && request.resource.data.imageFileId is string;
 
-      // Users can update or delete only their own news.
       allow update, delete: if request.auth != null
         && resource.data.authorUid == request.auth.uid;
     }
@@ -36,7 +29,7 @@ service cloud.firestore {
     // Lunch Music Requests
     match /lunchMusicRequests/{requestId} {
 
-      // Anyone can submit a music request without login.
+      // Anyone can submit a request without login.
       allow create: if
         request.resource.data.keys().hasAll([
           "name",
@@ -68,8 +61,11 @@ service cloud.firestore {
         && request.resource.data.status == "pending"
         && request.resource.data.createdAt is timestamp;
 
-      // Public users cannot read, update, or delete requests.
-      allow read, update, delete: if false;
+      // Authenticated users can view and delete requests.
+      allow read, delete: if request.auth != null;
+
+      // Requests cannot be edited.
+      allow update: if false;
     }
   }
 }

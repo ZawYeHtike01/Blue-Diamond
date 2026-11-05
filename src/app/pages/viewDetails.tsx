@@ -168,7 +168,7 @@ const NewsDetails = () => {
         <Reveal>
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="mb-8 text-xl font-bold transition-opacity hover:opacity-70"
             style={{ position: "fixed", cursor: "pointer" }}
           >

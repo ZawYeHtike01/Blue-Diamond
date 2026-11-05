@@ -359,9 +359,9 @@ export default function NewsList() {
               type="button"
               onClick={() => void loadMore()}
               disabled={loading}
-              className="border border-[#292929] px-8 py-3 text-sm font-bold transition hover:border-[#397ff0] disabled:opacity-50"
+              className="border border-[#397ff0] px-8 py-3 text-sm font-bold tracking-wider text-[#397ff0] transition hover:bg-[#397ff0] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "Loading..." : "Load More"}
+              {loading ? "LOADING" : "LOAD MORE ↓"}
             </button>
           </div>
         )}
@@ -369,7 +369,7 @@ export default function NewsList() {
         {/* All News Loaded */}
         {newsLoaded && !hasMoreNews && news.length > 0 && (
           <p className="mt-8 text-center text-sm text-neutral-600">
-            All news loaded.
+            — ALL NEWS LOADED —
           </p>
         )}
       </div>

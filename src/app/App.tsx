@@ -18,6 +18,7 @@ import NewsUpdate from "./admin/newsupdate";
 import { auth } from "../firebase/firebase";
 import NewsDetails from "./pages/viewDetails";
 import SongRequest from "./pages/songRequest";
+import LunchMusicRequestList from "./admin/LunchMusicRequestList";
 
 export interface LunchEvent {
   id: string;
@@ -83,6 +84,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <AdminHome />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/musicrequestlist",
+        element: (
+          <ProtectedRoute>
+            <LunchMusicRequestList />
           </ProtectedRoute>
         ),
       },
