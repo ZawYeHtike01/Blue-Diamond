@@ -14,6 +14,7 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
+import { Trash2, AlertTriangle } from "lucide-react";
 import { useApp, type NewsItem } from "../App";
 import { db } from "../../firebase/firebase";
 
@@ -31,7 +32,6 @@ export default function NewsList() {
     setHasMoreNews,
     newsLoaded,
     setNewsLoaded,
-    resetNewsCache,
     setGlobalMsg,
     user,
   } = useApp();
@@ -40,6 +40,9 @@ export default function NewsList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Delete Confirmation Modal
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
   // Load the first 10 documents, then fetch 10 more per click.
   const loadMore = useCallback(async () => {
@@ -130,8 +133,8 @@ export default function NewsList() {
     }
   }, [newsLoaded, loadMore]);
 
-  // Delete News and remove it from the global cache.
-  const handleDelete = async (item: NewsItem) => {
+  // Open Delete Confirmation Modal
+  const handleDelete = (item: NewsItem) => {
     if (!user) {
       setGlobalMsg({
         type: "error",
@@ -142,18 +145,26 @@ export default function NewsList() {
 
     if (deletingId !== null) return;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${item.title}"?`,
-    );
+    setSelectedNews(item);
+  };
 
-    if (!confirmed) return;
+  // Confirm Delete
+  const confirmDelete = async () => {
+    if (!selectedNews || !user || deletingId !== null) return;
+
+    const item = selectedNews;
 
     setDeletingId(item.id);
 
     try {
       await deleteDoc(doc(db, "news", item.id));
 
-      setNews((current) => current.filter((newsItem) => newsItem.id !== item.id));
+      // Remove deleted News from global cache
+      setNews((current) =>
+        current.filter((newsItem) => newsItem.id !== item.id)
+      );
+
+      setSelectedNews(null);
 
       setGlobalMsg({
         type: "success",
@@ -171,6 +182,24 @@ export default function NewsList() {
     }
   };
 
+  // Close Modal with Escape Key
+  useEffect(() => {
+    if (!selectedNews || deletingId !== null) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedNews(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [selectedNews, deletingId]);
+
+  // Format Date
   const formatDate = (date: Date | null) => {
     if (!date) return "—";
 
@@ -183,17 +212,20 @@ export default function NewsList() {
     });
   };
 
+  // Search by title or author
   const filteredNews = news.filter((item) =>
     `${item.title} ${item.author}`
       .toLowerCase()
-      .includes(search.toLowerCase().trim()),
+      .includes(search.toLowerCase().trim())
   );
 
   return (
     <main className="min-h-screen border-x-2 border-t-2 border-[#168bdb] bg-[#050505] px-5 py-8 text-white sm:px-10 md:px-16">
+
+      {/* Back Button */}
       <button
         type="button"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate(`/admin/#${news}`)}
         className="mb-8 text-xl font-bold transition-opacity hover:opacity-70"
         style={{ position: "fixed", cursor: "pointer" }}
       >
@@ -201,6 +233,8 @@ export default function NewsList() {
       </button>
 
       <div className="mx-auto mt-[3rem] max-w-4xl">
+
+        {/* Header */}
         <header className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-xl font-black tracking-[3px] sm:text-2xl">
@@ -221,6 +255,7 @@ export default function NewsList() {
           </button>
         </header>
 
+        {/* Search */}
         <div className="mt-10">
           <input
             type="search"
@@ -231,6 +266,7 @@ export default function NewsList() {
           />
         </div>
 
+        {/* News List */}
         <section className="mt-8 space-y-4">
           {loading && news.length === 0 ? (
             <p className="py-12 text-center text-neutral-400">
@@ -238,7 +274,9 @@ export default function NewsList() {
             </p>
           ) : error && news.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-red-400">Unable to load News.</p>
+              <p className="text-red-400">
+                Unable to load News.
+              </p>
 
               <button
                 type="button"
@@ -264,6 +302,8 @@ export default function NewsList() {
                 className="border border-[#292929] p-5 transition hover:border-[#397ff0] sm:p-6"
               >
                 <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+
+                  {/* News Information */}
                   <div className="min-w-0 flex-1">
                     <h2 className="break-words text-lg font-bold sm:text-xl">
                       {item.title || "Untitled"}
@@ -278,9 +318,11 @@ export default function NewsList() {
                     </p>
                   </div>
 
+                  {/* Action Buttons */}
                   <div className="flex shrink-0 gap-2">
                     {user && (
                       <>
+                        {/* Update Button */}
                         <button
                           type="button"
                           onClick={() =>
@@ -291,13 +333,15 @@ export default function NewsList() {
                           Update
                         </button>
 
+                        {/* Delete Button */}
                         <button
                           type="button"
-                          onClick={() => void handleDelete(item)}
+                          onClick={() => handleDelete(item)}
                           disabled={deletingId !== null}
-                          className="border border-red-900 px-3 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-950 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="flex items-center gap-2 border border-red-900 px-3 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-950 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          {deletingId === item.id ? "Deleting..." : "Delete"}
+                          <Trash2 size={14} />
+                          Delete
                         </button>
                       </>
                     )}
@@ -308,6 +352,7 @@ export default function NewsList() {
           )}
         </section>
 
+        {/* Load More */}
         {newsLoaded && hasMoreNews && (
           <div className="mt-8 text-center">
             <button
@@ -321,12 +366,104 @@ export default function NewsList() {
           </div>
         )}
 
+        {/* All News Loaded */}
         {newsLoaded && !hasMoreNews && news.length > 0 && (
           <p className="mt-8 text-center text-sm text-neutral-600">
             All news loaded.
           </p>
         )}
       </div>
+
+      {/* ================================= */}
+      {/* Delete Confirmation Modal */}
+      {/* ================================= */}
+
+      {selectedNews && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-5 backdrop-blur-sm"
+          onClick={(e) => {
+            if (
+              e.target === e.currentTarget &&
+              deletingId === null
+            ) {
+              setSelectedNews(null);
+            }
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+            className="w-full max-w-md border border-[#292929] bg-[#101010] p-6 shadow-2xl sm:p-8"
+          >
+
+            {/* Warning Icon */}
+            <div className="mb-6 flex h-14 w-14 items-center justify-center border border-red-900 bg-red-950/40">
+              <AlertTriangle
+                size={26}
+                className="text-red-400"
+              />
+            </div>
+
+            {/* Modal Title */}
+            <h2
+              id="delete-modal-title"
+              className="text-xl font-black tracking-wide text-white"
+            >
+              Delete News?
+            </h2>
+
+            <p className="mt-3 text-sm leading-relaxed text-neutral-400">
+              Are you sure you want to delete this News?
+              This action cannot be undone.
+            </p>
+
+            {/* News Information */}
+            <div className="mt-5 border border-[#292929] bg-[#080808] p-4">
+              <p className="break-words font-bold text-white">
+                {selectedNews.title || "Untitled"}
+              </p>
+
+              <p className="mt-2 text-sm text-neutral-500">
+                Author: {selectedNews.author || "Unknown"}
+              </p>
+
+              <p className="mt-1 text-xs text-neutral-600">
+                Posted: {formatDate(selectedNews.createdAt)}
+              </p>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+              {/* Cancel Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedNews(null)}
+                disabled={deletingId !== null}
+                className="border border-[#333] px-5 py-3 text-sm font-bold text-neutral-300 transition hover:bg-[#222] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              {/* Confirm Delete Button */}
+              <button
+                type="button"
+                onClick={() => void confirmDelete()}
+                disabled={deletingId !== null}
+                className="flex items-center justify-center gap-2 bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Trash2 size={15} />
+
+                {deletingId !== null
+                  ? "Deleting..."
+                  : "Delete News"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }

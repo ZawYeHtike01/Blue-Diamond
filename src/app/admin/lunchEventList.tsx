@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,7 +12,7 @@ import {
 import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
 import { db } from "../../firebase/firebase";
 import { useApp } from "../App";
-import { Pointer } from "lucide-react";
+import { Trash2, AlertTriangle } from "lucide-react";
 
 interface LunchEvent {
   id: string;
@@ -25,17 +26,22 @@ interface LunchEvent {
 
 export default function LunchEventList() {
   const navigate = useNavigate();
-  const { globalMsg,setGlobalMsg } = useApp();
+  const { setGlobalMsg } = useApp();
 
   const [events, setEvents] = useState<LunchEvent[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  const [selectedEvent, setSelectedEvent] =
+    useState<LunchEvent | null>(null);
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Track Firebase Authentication state
+  // Firebase Authentication
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
       setCurrentUser(user);
@@ -49,7 +55,7 @@ export default function LunchEventList() {
   useEffect(() => {
     const eventsQuery = query(
       collection(db, "lunchEvents"),
-      orderBy("date", "asc"),
+      orderBy("date", "desc")
     );
 
     const unsubscribe = onSnapshot(
@@ -68,14 +74,14 @@ export default function LunchEventList() {
         console.error("Failed to load Lunch Events:", err);
         setLoading(false);
         setError(true);
-      },
+      }
     );
 
     return () => unsubscribe();
   }, []);
 
-  // Delete Lunch Event
-  const handleDelete = async (eventId: string) => {
+  // Open Delete Confirmation Modal
+  const handleDelete = (event: LunchEvent) => {
     if (!currentUser) {
       setGlobalMsg({
         type: "error",
@@ -86,16 +92,23 @@ export default function LunchEventList() {
 
     if (deletingId !== null) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this Lunch Event?",
-    );
+    setSelectedEvent(event);
+  };
 
-    if (!confirmed) return;
+  // Confirm Delete
+  const confirmDelete = async () => {
+    if (!selectedEvent || !currentUser || deletingId !== null) {
+      return;
+    }
+
+    const eventId = selectedEvent.id;
 
     setDeletingId(eventId);
 
     try {
       await deleteDoc(doc(db, "lunchEvents", eventId));
+
+      setSelectedEvent(null);
 
       setGlobalMsg({
         type: "success",
@@ -113,15 +126,34 @@ export default function LunchEventList() {
     }
   };
 
+  // Close Modal with Escape Key
+  useEffect(() => {
+    if (!selectedEvent || deletingId !== null) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedEvent(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [selectedEvent, deletingId]);
+
   // Search by song or artist
   const filteredEvents = events.filter((event) =>
     `${event.songName ?? ""} ${event.artistName ?? ""}`
       .toLowerCase()
-      .includes(search.toLowerCase().trim()),
+      .includes(search.toLowerCase().trim())
   );
 
   return (
     <main className="min-h-screen border-x-2 border-t-2 border-[#168bdb] bg-[#050505] px-5 py-8 text-white sm:px-10 md:px-16">
+
+      {/* Back Button */}
       <button
         type="button"
         onClick={() => navigate(-1)}
@@ -130,7 +162,9 @@ export default function LunchEventList() {
       >
         ← 戻す
       </button>
-      <div className="mx-auto max-w-4xl mt-[3rem]">
+
+      <div className="mx-auto mt-[3rem] max-w-4xl">
+
         {/* Header */}
         <header className="flex items-center justify-between gap-4">
           <div>
@@ -171,7 +205,9 @@ export default function LunchEventList() {
             </p>
           ) : error ? (
             <div className="py-12 text-center">
-              <p className="text-red-400">Unable to load Lunch Events.</p>
+              <p className="text-red-400">
+                Unable to load Lunch Events.
+              </p>
 
               <button
                 type="button"
@@ -202,6 +238,7 @@ export default function LunchEventList() {
                 className="border border-[#292929] p-5 transition hover:border-[#397ff0] sm:p-6"
               >
                 <div className="flex items-start justify-between gap-4">
+
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold tracking-widest text-[#397ff0]">
                       {event.date}
@@ -222,16 +259,17 @@ export default function LunchEventList() {
                     )}
                   </div>
 
-                  {/* Delete button for logged-in users */}
+                  {/* Delete Button */}
                   {currentUser && (
                     <button
                       type="button"
-                      onClick={() => handleDelete(event.id)}
+                      onClick={() => handleDelete(event)}
                       disabled={deletingId !== null}
                       aria-label={`Delete ${event.songName}`}
-                      className="shrink-0 border border-red-900 px-3 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-950 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex shrink-0 items-center gap-2 border border-red-900 px-3 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-950 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {deletingId === event.id ? "Deleting..." : "Delete"}
+                      <Trash2 size={14} />
+                      Delete
                     </button>
                   )}
                 </div>
@@ -240,6 +278,93 @@ export default function LunchEventList() {
           )}
         </section>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {selectedEvent && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-5 backdrop-blur-sm"
+          onClick={(e) => {
+            if (
+              e.target === e.currentTarget &&
+              deletingId === null
+            ) {
+              setSelectedEvent(null);
+            }
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+            className="w-full max-w-md border border-[#292929] bg-[#101010] p-6 shadow-2xl sm:p-8"
+          >
+
+            {/* Warning Icon */}
+            <div className="mb-6 flex h-14 w-14 items-center justify-center border border-red-900 bg-red-950/40">
+              <AlertTriangle
+                size={26}
+                className="text-red-400"
+              />
+            </div>
+
+            {/* Modal Title */}
+            <h2
+              id="delete-modal-title"
+              className="text-xl font-black tracking-wide text-white"
+            >
+              Delete Lunch Event?
+            </h2>
+
+            <p className="mt-3 text-sm leading-relaxed text-neutral-400">
+              Are you sure you want to delete this Lunch Event?
+              This action cannot be undone.
+            </p>
+
+            {/* Event Information */}
+            <div className="mt-5 border border-[#292929] bg-[#080808] p-4">
+              <p className="text-xs font-bold tracking-widest text-[#397ff0]">
+                {selectedEvent.date}
+              </p>
+
+              <p className="mt-2 break-words font-bold text-white">
+                {selectedEvent.songName}
+              </p>
+
+              <p className="mt-1 text-sm text-neutral-500">
+                Artist: {selectedEvent.artistName}
+              </p>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+              {/* Cancel */}
+              <button
+                type="button"
+                onClick={() => setSelectedEvent(null)}
+                disabled={deletingId !== null}
+                className="border border-[#333] px-5 py-3 text-sm font-bold text-neutral-300 transition hover:bg-[#222] disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              {/* Confirm Delete */}
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={deletingId !== null}
+                className="flex items-center justify-center gap-2 bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Trash2 size={15} />
+
+                {deletingId !== null
+                  ? "Deleting..."
+                  : "Delete Event"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

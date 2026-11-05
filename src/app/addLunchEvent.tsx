@@ -67,6 +67,7 @@ export default function AddLunchEvent() {
       );
     } finally {
       setLoading(false);
+      navigate("/admin/luncheventlist");
     }
   };
 

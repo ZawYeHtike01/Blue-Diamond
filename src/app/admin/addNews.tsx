@@ -257,7 +257,7 @@ export default function AddNews() {
     <main className="min-h-screen border-x-2 border-t-2 border-[#168bdb] bg-[#050505] px-[22px] py-[30px] text-white sm:px-[5%]">
       <button
         type="button"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/admin/newslist")}
         className="fixed z-10 text-xl font-bold transition-opacity hover:opacity-70"
         style={{ cursor: "pointer" }}
       >
