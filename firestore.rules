@@ -32,5 +32,44 @@ service cloud.firestore {
       allow update, delete: if request.auth != null
         && resource.data.authorUid == request.auth.uid;
     }
+
+    // Lunch Music Requests
+    match /lunchMusicRequests/{requestId} {
+
+      // Anyone can submit a music request without login.
+      allow create: if
+        request.resource.data.keys().hasAll([
+          "name",
+          "songName",
+          "artistName",
+          "remark",
+          "status",
+          "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "name",
+          "songName",
+          "artistName",
+          "remark",
+          "status",
+          "createdAt"
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.songName is string
+        && request.resource.data.songName.size() > 0
+        && request.resource.data.songName.size() <= 150
+        && request.resource.data.artistName is string
+        && request.resource.data.artistName.size() > 0
+        && request.resource.data.artistName.size() <= 150
+        && request.resource.data.remark is string
+        && request.resource.data.remark.size() <= 2000
+        && request.resource.data.status == "pending"
+        && request.resource.data.createdAt is timestamp;
+
+      // Public users cannot read, update, or delete requests.
+      allow read, update, delete: if false;
+    }
   }
 }

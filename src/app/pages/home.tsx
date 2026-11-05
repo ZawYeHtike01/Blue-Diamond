@@ -341,7 +341,7 @@ export default function Home() {
               >
                 <button
                   type="button"
-                  onClick={() => scrollToSection("lineup")}
+                  onClick={() => navigate("/songrequest")}
                   className="
                     inline-block
                     cursor-pointer
