@@ -14,7 +14,7 @@ import Template from "./template";
 import AdminHome from "./admin/Admn_home";
 import Login from "./admin/Login";
 import ProtectedRoute from "../ProtecedRoute";
-import AddLunchEvent from "./admin/addNews";
+import AddLunchEvent from "./addLunchEvent";
 import LunchEventList from "./admin/lunchEventList";
 import AddNews from "./admin/addNews";
 import NewsList from "./admin/newsList";
