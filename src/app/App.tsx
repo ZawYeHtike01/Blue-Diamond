@@ -1,10 +1,6 @@
-
 import { useState, createContext, useContext, useEffect } from "react";
 import type { ReactNode, Dispatch, SetStateAction } from "react";
-import type {
-  QueryDocumentSnapshot,
-  DocumentData,
-} from "firebase/firestore";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { CssBaseline } from "@mui/material";
 import { RouterProvider, createHashRouter } from "react-router-dom";
 import { onAuthStateChanged, type User } from "firebase/auth";
@@ -92,11 +88,7 @@ const routes = [
       },
       {
         path: "/songrequest",
-        element: (
-          <ProtectedRoute>
-            <SongRequest />
-          </ProtectedRoute>
-        ),
+        element: <SongRequest />,
       },
       {
         path: "/admin/luncheventlist/submit",
@@ -140,11 +132,7 @@ const routes = [
       },
       {
         path: "/admin/newdetails/:id",
-        element: (
-          
-            <NewsDetails />
-          
-        ),
+        element: <NewsDetails />,
       },
     ],
   },
